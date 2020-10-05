@@ -1,13 +1,14 @@
+FROM 0x01be/gradle:build as build
+
 FROM alpine
 
-ENV GRADLE_VERSION 6.6.1
-ADD https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip /gradle-${GRADLE_VERSION}.zip
+COPY --from=build /opt/gradle/ /opt/gradle/
 
-RUN apk add --no-cache --virtual gradle-build-dependencies \
-    unzip
+RUN apk add --no-cache --virtual gradle-runtime-dependencies \
+    --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+    --repository http://dl-cdn.alpinelinux.org/alpine/edge/community \
+    --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
+    openjdk15
 
-RUN unzip /gradle-${GRADLE_VERSION}.zip
-
-RUN mkdir -p /opt/gradle
-RUN mv /gradle-${GRADLE_VERSION}/* /opt/gradle/
+ENV PATH ${PATH}:/opt/gradle/bin/
 
